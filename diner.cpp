@@ -1,77 +1,89 @@
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include <vector>
-#include <atomic>
-#include <chrono>
 
-std::atomic<int> semaphores[5] = {1, 1, 1, 1, 1}; // One semaphore for each fork, initialized to 1
+using namespace std;
 
-void wait(std::atomic<int> &semaphore, int philosopher_id, int fork_id) {
-    while (semaphore <= 0) {
-        std::this_thread::yield(); // Busy wait
-    }
-    --semaphore;
+mutex forks[5];  // Mutex array to represent the forks
+
+void eating(int i) {
+    cout << "Philosopher " << i << " is eating.\n";
+    this_thread::sleep_for(chrono::milliseconds(100));  // Simulating eating time
 }
 
-void signal(std::atomic<int> &semaphore) {
-    ++semaphore;
+void thinking(int i) {
+    cout << "Philosopher " << i << " is thinking.\n";
+    this_thread::sleep_for(chrono::milliseconds(100));  // Simulating thinking time
 }
 
-void think(int id) {
-    std::cout << "Philosopher " << id << " is thinking.\n";
-    std::this_thread::sleep_for(std::chrono::milliseconds(150));
-}
-
-void eat(int id) {
-    std::cout << "Philosopher " << id << " is eating.\n" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(150));
-}
-void pick_up_forks(int i) {
-    if (i % 2 == 0) {
-        wait(semaphores[i], i, i); // Pick up the left fork first
-        std::cout << "Philosopher " << i << " picked up fork " << i << "." << std::endl;
-        if (semaphores[(i + 1) % 5] <= 0) {
-            std::cout << "Philosopher " << i << " is waiting for fork " << (i + 1) % 5 << "." << std::endl << std::endl;
+void pf(int i){
+    // Philosophers pick up forks in different orders to avoid deadlock
+     if (i % 2 == 0) {  
+            forks[i].lock();
+            cout << "Philosopher " << i << " picks up fork " << i << ".\n";
+            forks[(i + 1) % 5].lock();
+            cout << "Philosopher " << i << " picks up fork " << (i + 1) % 5 << ".\n";
+        } else {  
+            forks[(i + 1) % 5].lock();
+            cout << "Philosopher " << i << " picks up fork " << (i + 1) % 5 << ".\n";
+            forks[i].lock();
+            cout << "Philosopher " << i << " picks up fork " << i << ".\n";
         }
-        wait(semaphores[(i + 1) % 5], i, (i + 1) % 5); // Pick up the right fork
-        std::cout << "Philosopher " << i << " picked up fork " << (i + 1) % 5 << "." << std::endl;
-    } else {
-        wait(semaphores[(i + 1) % 5], i, (i + 1) % 5); // Pick up the right fork first
-        std::cout << "Philosopher " << i << " picked up fork " << (i + 1) % 5 << "." << std::endl;
-        if (semaphores[i] <= 0) {
-            std::cout << "Philosopher " << i << " is waiting for fork " << i << "." << std::endl << std::endl;
-        }
-        wait(semaphores[i], i, i); // Pick up the left fork
-        std::cout << "Philosopher " << i << " picked up fork " << i << "." << std::endl;
-    }
+        //  while (true) {
+        //     if (i % 2 == 0) {  
+        //         forks[i].lock();
+        //         cout << "Philosopher " << i << " picks up fork " << i << ".\n";
+
+        //         if (forks[(i + 1) % 5].try_lock()) {  
+        //             cout << "Philosopher " << i << " picks up fork " << (i + 1) % 5 << ".\n";
+        //             break;
+        //         } else {  
+        //             cout << "Philosopher " << i << " is waiting for fork " << (i + 1) % 5 << ".\n";
+        //             forks[i].unlock();
+        //             this_thread::sleep_for(chrono::milliseconds(50));  // Wait before retrying
+        //         }
+        //     } else {  
+        //         forks[(i + 1) % 5].lock();
+        //         cout << "Philosopher " << i << " picks up fork " << (i + 1) % 5 << ".\n";
+
+        //         if (forks[i].try_lock()) {  
+        //             cout << "Philosopher " << i << " picks up fork " << i << ".\n";
+        //             break;
+        //         } else {  
+        //             cout << "Philosopher " << i << " is waiting for fork " << i << ".\n";
+        //             forks[(i + 1) % 5].unlock();
+        //             this_thread::sleep_for(chrono::milliseconds(50));  // Wait before retrying
+        //         }
+        //     }
+        // }
+}
+void pd(int i){
+    // Releasing forks
+    forks[i].unlock();
+    cout << "Philosopher " << i << " puts down fork " << i << ".\n";
+    forks[(i + 1) % 5].unlock();
+    cout << "Philosopher " << i << " puts down fork " << (i + 1) % 5 << ".\n";
 }
 
-void put_down_forks(int i) {
-    signal(semaphores[i]); // Release the left fork
-    std::cout << "Philosopher " << i << " put down fork " << i << ".\n";
-    signal(semaphores[(i + 1) % 5]); // Release the right fork
-    std::cout << "Philosopher " << i << " put down fork " << (i + 1) % 5 << ".\n";
-}
-
-void philosopher(int id) {
-    for (int j = 0; j < 3; ++j) { // Each philosopher alternates between thinking and eating 3 times
-        think(id);
-        pick_up_forks(id);
-        eat(id);
-        put_down_forks(id);
-    }
+void philosopher(int i) {
+    //for (int j = 0; j < 1; j++) {
+        thinking(i);
+        pf(i);
+        eating(i);
+        pd(i);        
+   // }
 }
 
 int main() {
-    std::vector<std::thread> philosophers;
-    for (int i = 0; i < 5; ++i) {
+    vector<thread> philosophers;
+    for (int i = 0; i < 5; i++) {
         philosophers.emplace_back(philosopher, i);
     }
-
     for (auto &p : philosophers) {
         p.join();
     }
 
-    std::cout << "All philosophers have finished their meals.\n";
+    cout << "All philosophers have eaten." << endl;
     return 0;
 }
