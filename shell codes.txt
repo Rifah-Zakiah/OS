@@ -1,0 +1,58 @@
+1. Write a Shell program to find the sum of odd and even numbers from a set of numbers.
+#!/bin/bash
+
+sum_odd=0
+sum_even=0
+
+# Prompt the user to enter numbers
+echo "Enter a set of numbers (separated by spaces):"
+read -a numbers
+
+# Loop through the numbers
+for num in "${numbers[@]}"; do
+    if (( num % 2 == 0 )); then
+        # If the number is even, add it to the even sum
+        sum_even=$((sum_even + num))
+    else
+        # If the number is odd, add it to the odd sum
+        sum_odd=$((sum_odd + num))
+    fi
+done
+
+# Display the results
+echo "Sum of even numbers: $sum_even"
+echo "Sum of odd numbers: $sum_odd"
+
+2. Write a Shell program to find the smallest number from a set of numbers.
+#!/bin/bash
+
+echo "ENter a set of numbers (separated by spaces):"
+read -a numbers
+
+small=numbers[0]
+
+for i in "${numbers[@]}";
+do
+	if(( i < small )); then
+		small=$i
+	fi
+done
+
+echo "Smallest number: $small"
+
+3. Write a Shell program to find the sum of all numbers between 50 and 100, which are divisible by 3 and
+not divisible by 5.
+sum=0
+for (( c = 50; c <= 100; c++ ));
+do
+        if(( c % 3 == 0 && c % 5 != 0)); then
+                sum=$((sum+c))
+        fi
+done
+echo "Sum: $sum"
+
+4. Write a Shell program to find the second highest number from a set of numbers.
+
+
+
+
