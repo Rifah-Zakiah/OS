@@ -51,7 +51,41 @@ do
 done
 echo "Sum: $sum"
 
-4. Write a Shell program to find the second highest number from a set of numbers.
+4. Calculator:
+#! /bin/bash
+echo "Select an operation:"
+echo
+echo "1. Addition (+)"
+echo "2. Subtraction (-)"
+echo "3. Multiplication (*)"
+echo "4. Division (/)"
+echo "5. Exit"
+echo
+echo "Enter Operator (1-5):"
+read op
+if [ $op = 5 ]; then
+        exit
+fi
+echo "Enter the first number:"
+read a
+echo "Enter the second number:"
+read b
+echo "Result:"
+if [ $op = 1 ]; then
+        echo $a + $b = $((a+b))
+elif [ $op = 2 ]; then
+        echo $a - $b = $((a-b))
+elif [ $op = 3 ]; then
+        echo $a * $b = $((a*b))
+elif [ $op = 4 ]; then
+        if [ $b = 0 ]; then
+                echo "Division by 0 is undefined."
+        else
+                echo $a / $b = $((a/b))
+        fi
+else
+        echo "Invalid operator."
+fi
 
 
 
