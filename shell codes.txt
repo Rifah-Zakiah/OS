@@ -89,4 +89,31 @@ fi
 
 
 
+Commands:
+1. systeminfo --- shows the information of the system
+2. ver --- shows the version of the OS
+3. date --- shows the current date and lets the user change the date
+4. date /t --- shows only the date
+5. time --- shows the time and lets the user change the time
+6. time /t --- shows only the time
+7. drivename: --- to enter a drive to change to that drive
+8. dir --- shows the directories present in the drive or files in the folder
+9. cd folder name --- will enter into a folder
+10. cd.. --- return to the previous drive/exit from the folder
+11. mkdir name --- to create a folder
+12. cd “path of the directory” --- to enter into the directory
+2
+13. type nul> filename --- to create a file
+14. ren oldfilename newfilename: --- to rename a file
+15. notepad filename: --- to write the file
+16. copy firstfilename secondfilename --- copy information from first file to second file
+17. del filename --- to delete a file
+18. move filename “folder path” --- to shift the file to the folder
+19. type filename --- to show the content of the file
+20. del foldername --- to delete the content of the folder/ file inside the folder
+21. rmdir foldername --- to delete the folder
+22. cls --- to clear the screen
+
+
+
 
